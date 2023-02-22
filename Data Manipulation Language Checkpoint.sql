@@ -1,0 +1,2 @@
+INSERT INTO customers (customer_id, Namee, adress, email) VALUES (1,"Alice","123 Main St", "@@"),(2,"Bob","456 Market St","^@@"),(3,"Charlie","789 Elm St","ooo");
+INSERT INTO products(product_id, Namee, price) VALUES(1,"Widget",10000),(2,"Gadget",20000),(3,"Doohickey",15000 );
