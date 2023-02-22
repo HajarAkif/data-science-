@@ -1,0 +1,3 @@
+CREATE TABLE customers ( customer_id INT PRIMARY KEY, Namee VARCHAR(20) NOT NULL, adress VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL);
+CREATE TABLE products ( product_id INT PRIMARY KEY, Namee VARCHAR(20) NOT NULL, price Float CHECK (price>0) NOT NULL);
+CREATE TABLE orders ( order_id INT PRIMARY KEY, quantity int NOT NULL, order_date DATE NOT NULL, customer_id int,product_id int, CONSTRAINT const_cus FOREIGN KEY (customer_id) REFERENCES customers (customer_id), CONSTRAINT const_pro FOREIGN KEY (product_id) REFERENCES products(product_id));
