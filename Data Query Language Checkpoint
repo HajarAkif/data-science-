@@ -1,0 +1,53 @@
+#CREATE TABLE Customer ( customer_id INT PRIMARY KEY, Customer_Name VARCHAR(20) NOT NULL, Customer_Tel VARCHAR(20) NOT Null);					
+#CREATE TABLE Product ( product_id INT PRIMARY KEY, Product_Name VARCHAR(20) NOT NULL, price Float NOT NULL, Category VARCHAR(20) NOT NULL);
+#CREATE TABLE Orders ( order_id int primary key ,quantity int NOT NULL, order_date DATE NOT NULL, Total_amount float not null, customer_id int,product_id int, CONSTRAINT const_cus FOREIGN KEY (customer_id) REFERENCES Customer (customer_id), CONSTRAINT const_pro FOREIGN KEY (product_id) REFERENCES Product(product_id));
+#INSERT INTO Customer (customer_id, Customer_Name, Customer_Tel) VALUES (1,"Alice","0658789658"),(2,"Bob"," 0687965874"),(3,"Charlie","0612487639"), (4,"Anna","0618789939");
+#INSERT INTO Product (product_id, Product_Name, price, Category) VALUES (1,"teck",10000, 'Widget'),(2,"fourni",20000,'Gadget'),(3,"car",15000 ,'Doohickey');#Insert into Orders( order_id, quantity, order_date, Total_amount, customer_id, product_id) VALUES ( 1,2,"2022-12-02",10000,1,2),( 2,8,"2022-09-02",40000,1,1),(3,1,"2022-02-07-",1000,4,1);
+#1-Write a SQL query to retrieve the names of the customers who have;placed an order for at least one widget and at least one gadget, along with the total cost of the widgets and gadgets ordered by each customer. The cost of each item should be calculated by multiplying the quantity by the price of the product.
+#Select Customer_Name from Customer C, Orders O INNER join Product P ON C. customer_id = O. customer_id where Product_Name = 'Widget' or Product_Name = 'Gadget' Order by Customer;
+#SELECT c.customer_name, SUM(p1.price * o1.quantity) AS widget_cost, SUM(p2.price * o2.quantity) AS gadget_cost, (SUM(p1.price * o1.quantity) + SUM(p2.price * o2.quantity)) AS total_costFROM customer c JOIN Orders o1 ON c.customer_id = o1.customer_id JOIN product p1 ON o1.product_id = p1.product_id AND p1.category = 'Widget'JOIN orders o2 ON c.customer_id = o2.customer_id JOIN product p2 ON o2.product_id = p2.product_id AND p2.category = 'Gadget'WHERE EXISTS (SELECT 1 FROM orders o3 JOIN product p3 ON o3.product_id = p3.product_id AND p3.category = 'Widget'WHERE o3.customer_id = c.customer_id)AND EXISTS (SELECT 1 FROM orders o4 JOIN product p4 ON o4.product_id = p4.product_id AND p4.category = 'Gadget'WHERE o4.customer_id = c.customer_id)GROUP BY c.customer_name;
+#Write a query to retrieve the names of the customers who have placed an order for at least one widget, along with the total cost of the widgets ordered by each customer.
+#SELECT c.Customer_Name, SUM(o.Total_amount) AS total_cost FROM Customer c JOIN Orders o ON c.customer_id = o.customer_id JOIN Product p ON o.product_id = p.product_id WHERE p.Category = 'Widget' GROUP BY c.Customer_Name;
+#Write a query to retrieve the names of the customers who have placed an order for at least one gadget, along with the total cost of the gadgets ordered by each customer.
+#SELECT Customer.Customer_Name, SUM(Orders.Total_amount) AS total_cost FROM Customer JOIN Orders ON Customer.customer_id = Orders.customer_id JOIN Product ON Orders.product_id = Product.product_id WHERE Product.Category = 'Gadget' GROUP BY Customer.customer_id;
+#Write a query to retrieve the names of the customers who have placed an order for at least one doohickey, along with the total cost of the doohickeys ordered by each customer.
+#SELECT Customer.Customer_Name, SUM(Orders.Total_amount) AS total_cost FROM Customer JOIN Orders ON Customer.customer_id = Orders.customer_id JOIN Product ON Orders.product_id = Product.product_id WHERE Product.Category = 'Doohickey'GROUP BY Customer.customer_id;
+#Write a query to retrieve the total number of widgets and gadgets ordered by each customer, along with the total cost of the orders.
+SELECT c.customer_id, c.Namee AS customer_name,
+       SUM(CASE WHEN p.type = 'widget' THEN oi.quantity ELSE 0 END) AS total_widgets_ordered,
+       SUM(CASE WHEN p.type = 'gadget' THEN oi.quantity ELSE 0 END) AS total_gadgets_ordered,
+       SUM(oi.quantity * p.price) AS total_cost
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON oi.product_id = p.product_id
+GROUP BY c.customer_id, c.Namee;
+#Write a query to retrieve the total number of widgets and gadgets ordered by each customer, along with the total cost of the orders.
+SELECT c.customer_id, c.Namee AS customer_name,
+       SUM(CASE WHEN p.type = 'widget' THEN oi.quantity ELSE 0 END) AS total_widgets_ordered,
+       SUM(CASE WHEN p.type = 'gadget' THEN oi.quantity ELSE 0 END) AS total_gadgets_ordered,
+       SUM(oi.quantity * p.price) AS total_cost
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON oi.product_id = p.product_id
+GROUP BY c.customer_id, c.Namee;
+#Write a query to retrieve the names of the products that have been ordered by at least one customer, along with the total quantity of each product ordered.
+SELECT p.product_name, SUM(oi.quantity) AS total_quantity_ordered
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+GROUP BY p.product_name
+HAVING SUM(oi.quantity) >= 1;
+#Write a query to retrieve the names of the customers who have placed the most orders, along with the total number of orders placed by each customer.
+SELECT c.Namee AS customer_name, COUNT(*) AS total_orders_placed
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.Namee
+HAVING COUNT(*) = (
+  SELECT MAX(order_count)
+  FROM (
+    SELECT COUNT(*) AS order_count
+    FROM orders
+    GROUP BY customer_id
+  ) AS order_counts
+);
